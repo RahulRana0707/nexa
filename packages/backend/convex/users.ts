@@ -12,10 +12,17 @@ export const add = mutation({
   args: { name: v.string() },
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
-    console.log("User Identity:", identity);
+
     if (!identity) {
       throw new Error("Not authenticated");
     }
+
+    const orgId = identity.orgId as string;
+
+    if (!orgId) {
+      throw new Error("Not part of an organization");
+    }
+
     const id = await ctx.db.insert("users", { name: args.name });
     return id;
   },
